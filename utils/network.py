@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
-
+from pkg_resources import parse_version
 
 class Conv2d(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
@@ -62,9 +62,19 @@ def save_net(fname, net):
 def load_net(fname, net):
     import h5py
     h5f = h5py.File(fname, mode='r')
-    for k, v in list(net.state_dict().items()):
-        param = torch.from_numpy(np.asarray(h5f[k]))
-        v.copy_(param)
+
+#    for param_tensor in net.state_dict():
+#        print(param_tensor, "\t", net.state_dict()[param_tensor].size())
+
+    if parse_version(torch.__version__) >= parse_version("1.0.0"):
+        for k, v in list(net.state_dict().items()):
+            if 'batches_tracked' not in k:
+                param = torch.from_numpy(np.asarray(h5f[k]))
+                v.copy_(param)
+    else:
+        for k,v in list(net.state_dict().items()):
+            param = torch.from_numpy(np.asarray(h5f[k]))
+            v.copy_(param)    
 
 
 def load_pretrained_npy(faster_rcnn_model, fname):

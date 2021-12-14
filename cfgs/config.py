@@ -1,7 +1,8 @@
 import os
-from .config_voc import *  # noqa
-from .exps.darknet19_exp1 import *  # noqa
-
+#from .config_voc import *  # noqa
+#from .exps.darknet19_exp1 import *  # noqa
+from .config_224 import *
+from .exps.darknet19_exp3 import *
 
 def mkdir(path, max_depth=3):
     parent, child = os.path.split(path)
@@ -14,29 +15,31 @@ def mkdir(path, max_depth=3):
 
 # input and output size
 ############################
-multi_scale_inp_size = [np.array([320, 320], dtype=np.int),
-                        np.array([352, 352], dtype=np.int),
-                        np.array([384, 384], dtype=np.int),
-                        np.array([416, 416], dtype=np.int),
-                        np.array([448, 448], dtype=np.int),
-                        np.array([480, 480], dtype=np.int),
-                        np.array([512, 512], dtype=np.int),
-                        np.array([544, 544], dtype=np.int),
-                        np.array([576, 576], dtype=np.int),
+multi_scale_inp_size = [np.array([224,224],dtype=np.int),
+                        np.array([320, 320], dtype=np.int),
+#                        np.array([352, 352], dtype=np.int),
+#                        np.array([384, 384], dtype=np.int),
+#                        np.array([416, 416], dtype=np.int),
+#                        np.array([448, 448], dtype=np.int),
+#                        np.array([480, 480], dtype=np.int),
+#                        np.array([512, 512], dtype=np.int),
+#                        np.array([544, 544], dtype=np.int),
+                        #np.array([576, 576], dtype=np.int),
                         # np.array([608, 608], dtype=np.int),
                         ]   # w, h
 multi_scale_out_size = [multi_scale_inp_size[0] / 32,
                         multi_scale_inp_size[1] / 32,
-                        multi_scale_inp_size[2] / 32,
-                        multi_scale_inp_size[3] / 32,
-                        multi_scale_inp_size[4] / 32,
-                        multi_scale_inp_size[5] / 32,
-                        multi_scale_inp_size[6] / 32,
-                        multi_scale_inp_size[7] / 32,
-                        multi_scale_inp_size[8] / 32,
+ #                       multi_scale_inp_size[2] / 32,
+ #                       multi_scale_inp_size[3] / 32,
+ #                       multi_scale_inp_size[4] / 32,
+ #                       multi_scale_inp_size[5] / 32,
+ #                       multi_scale_inp_size[6] / 32,
+ #                       multi_scale_inp_size[7] / 32,
+ #                       multi_scale_inp_size[8] / 32,
                         # multi_scale_inp_size[9] / 32,
                         ]   # w, h
-inp_size = np.array([416, 416], dtype=np.int)   # w, h
+inp_size = np.array([224, 224], dtype=np.int)   # w, h
+#inp_size = np.array([224,224],dtype=np.int)
 out_size = inp_size / 32
 
 
@@ -69,7 +72,7 @@ TRAIN_DIR = os.path.join(MODEL_DIR, 'training')
 TEST_DIR = os.path.join(MODEL_DIR, 'testing')
 
 trained_model = os.path.join(MODEL_DIR, h5_fname)
-pretrained_model = os.path.join(MODEL_DIR, pretrained_fname)
+#pretrained_model = os.path.join(MODEL_DIR, pretrained_fname)
 train_output_dir = os.path.join(TRAIN_DIR, exp_name)
 test_output_dir = os.path.join(TEST_DIR, imdb_test, h5_fname)
 mkdir(train_output_dir, max_depth=3)

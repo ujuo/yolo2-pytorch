@@ -8,8 +8,11 @@ from darknet import Darknet19
 import utils.yolo as yolo_utils
 import utils.network as net_utils
 from utils.timer import Timer
-from datasets.pascal_voc import VOCDataset
+#from datasets.pascal_voc import VOCDataset
+from datasets.yolov2_tiny import VOCDataset
 import cfgs.config as cfg
+from loss import YoloLoss
+import torch.onnx
 
 
 parser = argparse.ArgumentParser(description='PyTorch Yolo')
@@ -18,18 +21,24 @@ parser.add_argument('--image_size_index', type=int, default=0,
                     help='setting images size index 0:320, 1:352, 2:384, 3:416, 4:448, 5:480, 6:512, 7:544, 8:576')
 args = parser.parse_args()
 
-
+load_weight_pth = 1
 # hyper-parameters
 # ------------
 imdb_name = cfg.imdb_test
 # trained_model = cfg.trained_model
-trained_model = os.path.join(cfg.train_output_dir,
-                             'darknet19_voc07trainval_exp3_73.h5')
+
+
+
+if load_weight_pth:
+   trained_model = os.path.join(cfg.train_output_dir,'best_weights.pth')
+else:
+   trained_model = os.path.join(cfg.train_output_dir,'best_weights.h5') #darknet19_trainval_224_311.h5')
+                          
 output_dir = cfg.test_output_dir
 
-max_per_image = 300
+max_per_image = 1 #300
 thresh = 0.01
-vis = False
+vis = True #False
 # ------------
 
 
@@ -46,16 +55,25 @@ def test_net(net, imdb, max_per_image=300, thresh=0.5, vis=False):
     _t = {'im_detect': Timer(), 'misc': Timer()}
     det_file = os.path.join(output_dir, 'detections.pkl')
     size_index = args.image_size_index
-
+    criterion = YoloLoss()
+    
     for i in range(num_images):
 
         batch = imdb.next_batch(size_index=size_index)
         ori_im = batch['origin_im'][0]
+        gt_boxes = batch['gt_boxes']
+        gt_classes = batch['gt_classes']
+        dontcare = batch['dontcare']
+
+
         im_data = net_utils.np_to_variable(batch['images'], is_cuda=True,
                                            volatile=True).permute(0, 3, 1, 2)
 
         _t['im_detect'].tic()
-        bbox_pred, iou_pred, prob_pred = net(im_data)
+      #  bbox_pred, iou_pred, prob_pred = net(im_data)
+        out = net(im_data)
+        bbox_pred, iou_pred, prob_pred = criterion(out,gt_boxes, gt_classes, dontcare, size_index,False)
+      
 
         # to numpy
         bbox_pred = bbox_pred.data.cpu().numpy()
@@ -101,20 +119,22 @@ def test_net(net, imdb, max_per_image=300, thresh=0.5, vis=False):
             print('im_detect: {:d}/{:d} {:.3f}s {:.3f}s'.format(i + 1, num_images, detect_time, nms_time))  # noqa
             _t['im_detect'].clear()
             _t['misc'].clear()
-
+        
         if vis:
             im2show = yolo_utils.draw_detection(ori_im,
                                                 bboxes,
                                                 scores,
                                                 cls_inds,
                                                 cfg,
-                                                thr=0.1)
+                                                thr=0.2)
             if im2show.shape[0] > 1100:
                 im2show = cv2.resize(im2show,
                                      (int(1000. * float(im2show.shape[1]) / im2show.shape[0]), 1000))  # noqa
-            cv2.imshow('test', im2show)
-            cv2.waitKey(0)
-
+           # cv2.imshow('test', im2show)
+           # cv2.waitKey(0)
+           
+            print("=============")    
+            cv2.imwrite('out/test%d.jpg' %i, im2show)
     with open(det_file, 'wb') as f:
         pickle.dump(all_boxes, f, pickle.HIGHEST_PROTOCOL)
 
@@ -129,9 +149,17 @@ if __name__ == '__main__':
                       processes=1, shuffle=False, dst_size=cfg.multi_scale_inp_size)
 
     net = Darknet19()
-    net_utils.load_net(trained_model, net)
-
     net.cuda()
+    
+    
+    if load_weight_pth:
+        checkpoint = torch.load(trained_model)
+        net.load_state_dict(checkpoint['state'])
+    else:
+        net_utils.load_net(trained_model, net)
+
+
+    
     net.eval()
 
     test_net(net, imdb, max_per_image, thresh, vis)
