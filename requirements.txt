@@ -1,4 +1,9 @@
+requests==2.13.0
 Cython==0.27.3
 opencv-python==3.3.0.10
 h5py==2.7.1
 pycrayon==0.5
+torch==0.4.0
+cffi==1.12.0
+scipy==1.1.0
+
