@@ -1,25 +1,28 @@
 # YOLOv2-tiny in PyTorch
 1. Install gpu driver 
-NVIDIA-Linux-x86_64-460.80.run
-cuda_9.0.176_384.81_linux.run
-cudnn-9.0-linux-x64-v7.6.5.32.tgz
+- NVIDIA-Linux-x86_64-460.80.run
+- cuda_9.0.176_384.81_linux.run
+- cudnn-9.0-linux-x64-v7.6.5.32.tgz
 
 2. Install gcc
-gcc version 6
+- gcc version 6
 
 3. Install anaconda & create conda environment
+```bash
 conda create -n yolo2-tiny python=3.6 pip
 conda activate yolo2-tiny
 pip install -r requirement
-
+```
 4. Build project files 
+```bash
 ./make.sh
-
+```
 5. Run
+```bash
 python demo.py
 python train.py
 python test.py
-
+```
 ## Make the training, validation, test data
 ```bash
 mkdir -p data/images/0
