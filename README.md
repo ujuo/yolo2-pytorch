@@ -21,16 +21,17 @@ python train.py
 python test.py
 
 ## Make the training, validation, test data
+'''bash
 mkdir -p data/images/0
 mkdir -p data/imagesets/0
 mkdir -p data/xml/0
 nano data/labels.txt
 nano data/imagesets/0/test.txt
 nano data/imagesets/0/trainval.txt
-
-copy your images to data/images/0
-copy your xml files to data/xml/0
-edit labels.txt , test.txt, trainval.txt 
+'''
+1. copy your images to data/images/0
+2. copy your xml files to data/xml/0
+3. edit labels.txt , test.txt, trainval.txt 
 
 
 # YOLOv2 in PyTorch
