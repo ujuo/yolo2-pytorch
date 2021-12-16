@@ -1,11 +1,16 @@
 # YOLOv2-tiny in PyTorch
-1. Install gpu driver 
-- NVIDIA-Linux-x86_64-460.80.run
-- cuda_9.0.176_384.81_linux.run
-- cudnn-9.0-linux-x64-v7.6.5.32.tgz
+1. Install gpu driver (ubuntu 20.04)
+- NVIDIA-Linux-x86_64-460.80.run (gcc 9.x)
+- cuda_9.0.176_384.81_linux.run (gcc 6.x)
+- cudnn-9.0-linux-x64-v7.6.5.32.tgz 
 
-2. Install gcc
-- gcc version 6
+2. Install gcc 6
+```bash
+echo "deb http://archive.ubuntu.com/ubuntu bionic main universe" >> /etc/apt/sources.list
+sudo apt update
+sudo apt install g++-6
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 3
+```
 
 3. Install anaconda & create conda environment
 ```bash
